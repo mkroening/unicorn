@@ -295,7 +295,6 @@ qemu/config-host.mak: qemu/configure
 
 uc.o: qemu/config-host.mak FORCE
 	$(MAKE) -C qemu $(SMP_MFLAGS)
-	@python rename_objects.py
 
 $(UC_TARGET_OBJ) list.o: uc.o
 	@echo "--- $^ $@" > /dev/null
