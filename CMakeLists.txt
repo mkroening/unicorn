@@ -24,6 +24,7 @@ set(UNICORN_VERSION_PATCH 3)
 option(BUILD_SHARED_LIBS "Build shared instead of static library" ON)
 option(UNICORN_INSTALL "Install unicorn" ON)
 option(UNICORN_BUILD_SAMPLES "Build samples" ON)
+option(UNICORN_INTERPRETER "Use interpreter mode" OFF)
 set(UNICORN_ARCH "x86 arm aarch64 m68k mips sparc" CACHE STRING "Supported architectures")
 
 # Deprecated option (CMake has this feature built-in)
@@ -95,6 +96,10 @@ else()
         OUTPUT_VARIABLE UC_COMPILER_MACRO)
 
     while(TRUE)
+        if(UNICORN_INTERPRETER)
+            set(UNICORN_TARGET_ARCH "tci")
+            break()
+        endif()
         string(FIND ${UC_COMPILER_MACRO} "__x86_64__" UC_RET)
         if (${UC_RET} GREATER "0")
             set(UNICORN_TARGET_ARCH "i386")
@@ -298,6 +303,10 @@ add_library(x86_64-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(x86_64-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(x86_64-softmmu PRIVATE
         -DNEED_CPU_H
@@ -341,6 +350,10 @@ add_library(arm-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(arm-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(arm-softmmu PRIVATE
         -DNEED_CPU_H
@@ -381,6 +394,10 @@ add_library(armeb-softmmu OBJECT
     qemu/tcg/tcg.c
     qemu/translate-all.c
 )
+
+if(UNICORN_INTERPRETER)
+    target_sources(armeb-softmmu PRIVATE qemu/tci.c)
+endif()
 
 if(MSVC)
     target_compile_options(armeb-softmmu PRIVATE
@@ -428,6 +445,10 @@ add_library(aarch64-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(aarch64-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(aarch64-softmmu PRIVATE
         -DNEED_CPU_H
@@ -472,6 +493,10 @@ add_library(aarch64eb-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(aarch64eb-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(aarch64eb-softmmu PRIVATE
         -DNEED_CPU_H
@@ -509,6 +534,10 @@ add_library(m68k-softmmu OBJECT
     qemu/tcg/tcg.c
     qemu/translate-all.c
 )
+
+if(UNICORN_INTERPRETER)
+    target_sources(m68k-softmmu PRIVATE qemu/tci.c)
+endif()
 
 if(MSVC)
     target_compile_options(m68k-softmmu PRIVATE
@@ -553,6 +582,10 @@ add_library(mips-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(mips-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(mips-softmmu PRIVATE
         -DNEED_CPU_H
@@ -593,6 +626,10 @@ add_library(mipsel-softmmu OBJECT
     qemu/tcg/tcg.c
     qemu/translate-all.c
 )
+
+if(UNICORN_INTERPRETER)
+    target_sources(mipsel-softmmu PRIVATE qemu/tci.c)
+endif()
 
 if(MSVC)
     target_compile_options(mipsel-softmmu PRIVATE
@@ -635,6 +672,10 @@ add_library(mips64-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(mips64-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(mips64-softmmu PRIVATE
         -DNEED_CPU_H
@@ -675,6 +716,10 @@ add_library(mips64el-softmmu OBJECT
     qemu/tcg/tcg.c
     qemu/translate-all.c
 )
+
+if(UNICORN_INTERPRETER)
+    target_sources(mips64el-softmmu PRIVATE qemu/tci.c)
+endif()
 
 if(MSVC)
     target_compile_options(mips64el-softmmu PRIVATE
@@ -719,6 +764,10 @@ add_library(sparc-softmmu OBJECT
     qemu/translate-all.c
 )
 
+if(UNICORN_INTERPRETER)
+    target_sources(sparc-softmmu PRIVATE qemu/tci.c)
+endif()
+
 if(MSVC)
     target_compile_options(sparc-softmmu PRIVATE
         -DNEED_CPU_H
@@ -760,6 +809,10 @@ add_library(sparc64-softmmu OBJECT
     qemu/tcg/tcg.c
     qemu/translate-all.c
 )
+
+if(UNICORN_INTERPRETER)
+    target_sources(sparc64-softmmu PRIVATE qemu/tci.c)
+endif()
 
 if(MSVC)
     target_compile_options(sparc64-softmmu PRIVATE
