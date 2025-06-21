@@ -290,11 +290,12 @@ all: unicorn
 
 qemu/config-host.mak: qemu/configure
 	cd qemu && \
-	./configure --cc="${CC}" --extra-cflags="$(UNICORN_CFLAGS)" --target-list="$(UNICORN_TARGETS)" ${UNICORN_QEMU_FLAGS}
+	./configure --cc="${CC}" --extra-cflags="$(UNICORN_CFLAGS)" --target-list="$(UNICORN_TARGETS)" ${UNICORN_QEMU_FLAGS} --disable-stack-protector --cpu=i386
 	@printf "$(UNICORN_ARCHS)" > config.log
 
 uc.o: qemu/config-host.mak FORCE
 	$(MAKE) -C qemu $(SMP_MFLAGS)
+	@python rename_objects.py
 
 $(UC_TARGET_OBJ) list.o: uc.o
 	@echo "--- $^ $@" > /dev/null

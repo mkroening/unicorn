@@ -1,3 +1,4 @@
+#define GEN_ADAPTER_DEFINE
 /*
  *  ARM translation
  *

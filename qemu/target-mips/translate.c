@@ -1,3 +1,4 @@
+#define GEN_ADAPTER_DEFINE
 /*
  *  MIPS32 emulation for qemu: main translation routines.
  *

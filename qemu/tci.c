@@ -159,7 +159,7 @@ static uint64_t tci_uint64(uint32_t high, uint32_t low)
 /* Read constant (native size) from bytecode. */
 static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
 {
-    tcg_target_ulong value = *(tcg_target_ulong *)(*tb_ptr);
+    tcg_target_ulong value = UNALIGNED_READ32_LE(*tb_ptr);
     *tb_ptr += sizeof(value);
     return value;
 }
@@ -167,7 +167,7 @@ static tcg_target_ulong tci_read_i(uint8_t **tb_ptr)
 /* Read unsigned constant (32 bit) from bytecode. */
 static uint32_t tci_read_i32(uint8_t **tb_ptr)
 {
-    uint32_t value = *(uint32_t *)(*tb_ptr);
+    uint32_t value = UNALIGNED_READ32_LE(*tb_ptr);
     *tb_ptr += sizeof(value);
     return value;
 }
@@ -175,7 +175,7 @@ static uint32_t tci_read_i32(uint8_t **tb_ptr)
 /* Read signed constant (32 bit) from bytecode. */
 static int32_t tci_read_s32(uint8_t **tb_ptr)
 {
-    int32_t value = *(int32_t *)(*tb_ptr);
+    int32_t value = UNALIGNED_READ32_LE(*tb_ptr);
     *tb_ptr += sizeof(value);
     return value;
 }
@@ -602,7 +602,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             t0 = *tb_ptr++;
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            tci_write_reg32(t0, *(uint32_t *)(t1 + t2));
+            tci_write_reg32(t0, UNALIGNED_READ32_LE(t1 + t2));
             break;
         case INDEX_op_st8_i32:
             t0 = tci_read_r8(&tb_ptr);
@@ -614,14 +614,14 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             t0 = tci_read_r16(&tb_ptr);
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            *(uint16_t *)(t1 + t2) = t0;
+            UNALIGNED_WRITE16_LE(t1 + t2, t0);
             break;
         case INDEX_op_st_i32:
             t0 = tci_read_r32(&tb_ptr);
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
             assert(t1 != sp_value || (int32_t)t2 < 0);
-            *(uint32_t *)(t1 + t2) = t0;
+            UNALIGNED_WRITE32_LE(t1 + t2, t0);
             break;
 
             /* Arithmetic operations (32 bit). */
@@ -869,19 +869,19 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             t0 = *tb_ptr++;
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            tci_write_reg32(t0, *(uint32_t *)(t1 + t2));
+            tci_write_reg32(t0, UNALIGNED_READ32_LE(t1 + t2));
             break;
         case INDEX_op_ld32s_i64:
             t0 = *tb_ptr++;
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            tci_write_reg32s(t0, *(int32_t *)(t1 + t2));
+            tci_write_reg32s(t0, (int32_t)UNALIGNED_READ32_LE(t1 + t2));
             break;
         case INDEX_op_ld_i64:
             t0 = *tb_ptr++;
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            tci_write_reg64(t0, *(uint64_t *)(t1 + t2));
+            tci_write_reg64(t0, UNALIGNED_READ64_LE(t1 + t2));
             break;
         case INDEX_op_st8_i64:
             t0 = tci_read_r8(&tb_ptr);
@@ -893,20 +893,20 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             t0 = tci_read_r16(&tb_ptr);
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            *(uint16_t *)(t1 + t2) = t0;
+            UNALIGNED_WRITE16_LE(t1 + t2, t0);
             break;
         case INDEX_op_st32_i64:
             t0 = tci_read_r32(&tb_ptr);
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
-            *(uint32_t *)(t1 + t2) = t0;
+            UNALIGNED_WRITE32_LE(t1 + t2, t0);
             break;
         case INDEX_op_st_i64:
             t0 = tci_read_r64(&tb_ptr);
             t1 = tci_read_r(&tb_ptr);
             t2 = tci_read_s32(&tb_ptr);
             assert(t1 != sp_value || (int32_t)t2 < 0);
-            *(uint64_t *)(t1 + t2) = t0;
+            UNALIGNED_WRITE64_LE(t1 + t2, t0);
             break;
 
             /* Arithmetic operations (64 bit). */
@@ -1109,7 +1109,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
             break;
 #endif
         case INDEX_op_exit_tb:
-            next_tb = *(uint64_t *)tb_ptr;
+            next_tb = UNALIGNED_READ64_LE(tb_ptr);
             goto exit;
             break;
         case INDEX_op_goto_tb:
